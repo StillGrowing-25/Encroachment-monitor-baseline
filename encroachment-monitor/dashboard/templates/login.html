@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Sign in · Encroachment Monitor{% endblock %}
+{% block content %}
+<div class="card login-card">
+  <h1>Sign in</h1>
+  <p class="muted">Role-based access: field officer, senior official, admin.</p>
+  {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+  <form method="post">
+    <label>Username <input name="username" autofocus autocomplete="username"></label>
+    <label>Password <input name="password" type="password" autocomplete="current-password"></label>
+    <button class="btn btn-primary" type="submit">Sign in</button>
+  </form>
+  <p class="muted small">Demo accounts: officer/officer123 · official/official123 · admin/admin123</p>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Audit log · Encroachment Monitor{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Audit log</h1>
+  <p class="muted small">Every access, acknowledgment and escalation is recorded (immutable trail).</p>
+  <table class="grid">
+    <thead><tr><th>#</th><th>Time (UTC)</th><th>User</th><th>Role</th><th>Action</th><th>Detail</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr><td>{{ r['id'] }}</td><td class="mono small">{{ r['ts'] }}</td><td>{{ r['user'] }}</td>
+          <td><span class="role role-{{ r['role'] }}">{{ r['role'] }}</span></td>
+          <td>{{ r['action'] }}</td><td class="small">{{ r['detail'] }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

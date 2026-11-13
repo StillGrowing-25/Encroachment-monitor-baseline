@@ -1,0 +1,4 @@
+scope,area_km2,tiles,processing_hours,core_hours,storage
+District,3000,459,0.01,0.1,2.2 GB
+State,130000,19848,0.24,3.3,94.0 GB
+Nation,3287000,501833,6.04,84.5,2.3 TB

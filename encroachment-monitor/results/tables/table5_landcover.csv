@@ -1,0 +1,6 @@
+class_,precision,recall,f1
+Open Land,1.0,1.0,1.0
+Vegetation,1.0,1.0,1.0
+Water,1.0,1.0,1.0
+Legal Construction,0.67,0.66,0.67
+Illegal Encroachment,0.67,0.68,0.68

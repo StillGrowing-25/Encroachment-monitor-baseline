@@ -1,0 +1,4 @@
+config,precision,recall,f1,iou,TP,FP,FN,TN
+Spectral only,0.24,1.0,0.39,0.24,567,1795,0,3638
++ Change detection,0.39,1.0,0.56,0.39,566,884,1,4549
++ Change + GIS,0.91,1.0,0.95,0.91,566,58,1,5375

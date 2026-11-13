@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Report · Encroachment Monitor{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="map-head">
+    <h1>Monitoring report</h1>
+    <a class="btn btn-primary" href="{{ url_for('report_csv') }}">Download CSV</a>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div class="kpi-n">{{ summary.detections }}</div><div class="kpi-l">detections</div></div>
+    <div class="kpi"><div class="kpi-n">{{ summary.true_positives }}</div><div class="kpi-l">verified encroachments</div></div>
+    <div class="kpi"><div class="kpi-n">{{ summary.detections - summary.true_positives }}</div><div class="kpi-l">seasonal flushes (FP)</div></div>
+    {% for s, n in summary.by_status.items() %}
+    <div class="kpi"><div class="kpi-n">{{ n }}</div><div class="kpi-l">{{ s|lower }}</div></div>
+    {% endfor %}
+  </div>
+  <h2>By severity</h2>
+  <table class="grid">
+    <thead><tr><th>Severity</th><th>Detections</th></tr></thead>
+    <tbody>
+    {% for r in by_severity %}<tr><td><span class="pill pill-{{ r['severity'] }}">{{ r['severity'] }}</span></td><td>{{ r['n'] }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  <p class="muted small">SLA: unacknowledged alerts escalate to a senior official after {{ sla_hours|int }} hours.</p>
+</div>
+{% endblock %}

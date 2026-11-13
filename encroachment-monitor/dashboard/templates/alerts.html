@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Alert queue · Encroachment Monitor{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="map-head">
+    <h1>Alert queue</h1>
+    <div class="filters">
+      <a class="btn {{ 'btn-primary' if not status }}" href="{{ url_for('alerts_view') }}">All</a>
+      {% for s in ['NEW','ACKNOWLEDGED','CONFIRMED','DISMISSED','ESCALATED'] %}
+      <a class="btn {{ 'btn-primary' if status==s }}" href="{{ url_for('alerts_view', status=s) }}">{{ s }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  <p class="muted small">Tiered protocol: field officer confirms or dismisses; alerts unacknowledged for {{ sla_hours|int }}h escalate automatically to a senior official. Escalation ran on this page load: {{ escalated_ids|length }} alert(s).</p>
+  <table class="grid">
+    <thead><tr><th>ID</th><th>Detection</th><th>Parcel</th><th>Location</th><th>ΔNDBI</th><th>Severity</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for a in alerts %}
+      <tr class="sev-{{ a['severity'] }} status-{{ a['status']|lower }}">
+        <td>{{ a['id'] }}</td>
+        <td>{{ a['site_id'] }}</td>
+        <td>{{ a['parcel_id'] }}</td>
+        <td class="mono">{{ '%.5f'|format(a['lat']) }}, {{ '%.5f'|format(a['lon']) }}</td>
+        <td>{{ '%.3f'|format(a['d_ndbi']) }}</td>
+        <td><span class="pill pill-{{ a['severity'] }}">{{ a['severity'] }}</span></td>
+        <td>{{ a['status'] }}{% if a['id'] in escalated_ids %} <span class="flash">▲</span>{% endif %}</td>
+        <td class="mono small">{{ a['created_at'] }}</td>
+        <td class="actions">
+          {% if can('acknowledge') and a['status'] == 'NEW' %}
+          <form method="post" action="{{ url_for('alert_ack', alert_id=a['id']) }}"><button class="btn btn-small">Acknowledge</button></form>
+          {% endif %}
+          {% if can('confirm') and a['status'] in ('NEW','ACKNOWLEDGED') %}
+          <form method="post" action="{{ url_for('alert_confirm', alert_id=a['id']) }}"><button class="btn btn-small btn-ok">Confirm</button></form>
+          {% endif %}
+          {% if can('dismiss') and a['status'] in ('NEW','ACKNOWLEDGED') %}
+          <form method="post" action="{{ url_for('alert_dismiss', alert_id=a['id']) }}"><button class="btn btn-small btn-no">Dismiss</button></form>
+          {% endif %}
+          {% if can('escalate') and a['status'] in ('NEW','ACKNOWLEDGED') %}
+          <form method="post" action="{{ url_for('alert_escalate', alert_id=a['id']) }}"><button class="btn btn-small btn-warn">Escalate</button></form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="9" class="muted">No alerts{{ ' with status ' + status if status }}.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{
+  "radiometric_max_abs_error": 1.1102230246251565e-16,
+  "registration_estimated_shift": [
+    0.2591071906997904,
+    -0.14472227547459948
+  ],
+  "registration_true_shift": [
+    0.4,
+    -0.3
+  ],
+  "registration_residual_px": 0.2096710648761326,
+  "cloud_fraction": 0.06999969482421875,
+  "augmentation_active": true
+}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}AOI Map · Encroachment Monitor{% endblock %}
+{% block content %}
+<div class="card map-card">
+  <div class="map-head">
+    <h1>Protected parcels &amp; detections</h1>
+    <div>
+      <a class="btn btn-primary" href="{{ url_for('alerts_view') }}">Alert queue{% if n_open %} <span class="pill">{{ n_open }} new</span>{% endif %}</a>
+      <a class="btn" href="{{ url_for('report_view') }}">Report</a>
+    </div>
+  </div>
+  <div id="map"></div>
+  <p class="muted small">Green: protected government parcels · grey: private parcels · red: detected change inside a protected parcel (cadastral overlay ∩ change mask). Tile imagery requires internet; detections render regardless.</p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const center = [{{ center[0] }}, {{ center[1] }}];
+  const map = L.map('map').setView(center, 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {maxZoom: 19, attribution: '&copy; OpenStreetMap'}).addTo(map);
+
+  fetch('/api/parcels.geojson').then(r => r.json()).then(gj => {
+    L.geoJSON(gj, {
+      style: f => f.properties.protected
+        ? {color: '#2e7d32', weight: 1, fillColor: '#66bb6a', fillOpacity: 0.25}
+        : {color: '#9e9e9e', weight: 0.6, fillColor: '#e0e0e0', fillOpacity: 0.12},
+      onEachFeature: (f, layer) => layer.bindPopup(
+        `<b>${f.properties.id}</b><br>${f.properties.protected ? 'Protected (government)' : 'Private'}<br>${Math.round(f.properties.area_m2)} m²`)
+    }).addTo(map);
+  });
+
+  fetch('/api/detections.geojson').then(r => r.json()).then(gj => {
+    L.geoJSON(gj, {
+      pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+        radius: 6,
+        color: '#b71c1c', weight: 1.5,
+        fillColor: f.properties.is_true_positive ? '#e53935' : '#ff8a65',
+        fillOpacity: 0.85
+      }),
+      onEachFeature: (f, layer) => layer.bindPopup(
+        `<b>Detection ${f.properties.site_id}</b><br>parcel ${f.properties.parcel_id}<br>` +
+        `severity ${f.properties.severity}<br>ΔNDBI ${f.properties.d_ndbi.toFixed(3)}` +
+        (f.properties.is_true_positive ? '<br><span style="color:#b71c1c">verified encroachment</span>' : '<br>seasonal flush (false alarm)'))
+    }).addTo(map);
+  });
+</script>
+{% endblock %}
