@@ -1,20 +1,7 @@
-"""Preprocessing pipeline (paper Table III).
-
-Radiometric correction (TOA -> surface reflectance), geometric correction /
-co-registration (sub-pixel shift estimation and resampling), cloud masking
-from a scene-classification band, and training augmentation.
-"""
 from __future__ import annotations
 
 import numpy as np
 
-
-# ---------------------------------------------------------------------------
-# Radiometric correction (top-of-atmosphere -> surface reflectance)
-# ---------------------------------------------------------------------------
-# Per-band forward model used by the simulator:
-#   TOA = transmittance * SR + path_radiance
-# correction inverts it with the sensor calibration constants.
 TRANSMITTANCE = np.array([0.90, 0.92, 0.95, 0.96, 0.97])   # blue..swir
 PATH_RADIANCE = np.array([0.040, 0.030, 0.020, 0.008, 0.003])
 
@@ -26,17 +13,7 @@ def to_toa(sr: np.ndarray) -> np.ndarray:
 def to_surface_reflectance(toa: np.ndarray) -> np.ndarray:
     return np.maximum((toa - PATH_RADIANCE) / TRANSMITTANCE, 0.0)
 
-
-# ---------------------------------------------------------------------------
-# Geometric correction / co-registration
-# ---------------------------------------------------------------------------
 def estimate_shift(img_ref: np.ndarray, img_mov: np.ndarray) -> tuple[float, float]:
-    """Estimate sub-pixel (dy, dx) that aligns img_mov onto img_ref, i.e.
-    shift_image(img_mov, dy, dx) registers the pair (< 1 px RMSE).
-
-    Phase correlation on the mean band gives an integer peak; sub-pixel
-    refinement uses the parabolic fit around the peak.
-    """
     a = np.mean(img_ref, axis=-1)
     b = np.mean(img_mov, axis=-1)
     a = a - a.mean()
