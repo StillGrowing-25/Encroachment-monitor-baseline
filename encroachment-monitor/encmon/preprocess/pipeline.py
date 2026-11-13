@@ -20,12 +20,10 @@ PATH_RADIANCE = np.array([0.040, 0.030, 0.020, 0.008, 0.003])
 
 
 def to_toa(sr: np.ndarray) -> np.ndarray:
-    """Forward model: surface reflectance -> top-of-atmosphere radiance-equivalent."""
     return TRANSMITTANCE * sr + PATH_RADIANCE
 
 
 def to_surface_reflectance(toa: np.ndarray) -> np.ndarray:
-    """Radiometric correction: invert the atmospheric term (Table III, step 1)."""
     return np.maximum((toa - PATH_RADIANCE) / TRANSMITTANCE, 0.0)
 
 
